@@ -11,11 +11,12 @@
  
 */
 
-// Define GPIO pins used for relays
-#define RELAY1 8
-#define RELAY2 9
-#define RELAY3 10
-#define RELAY4 11
+// Define GPIO pins used for relays and LED
+#define RELAY1  8
+#define RELAY2  9
+#define RELAY3  10
+#define RELAY4  11
+#define LED     13
 
 #define MQTT_TOPIC "finchway/relays"
 
@@ -25,6 +26,13 @@
 
 // MQTT broker address
 IPAddress broker(192, 168, 0, 120);
+
+void flashLed(int ms)
+{
+  digitalWrite(LED, 1);
+  delay(ms);
+  digitalWrite(LED, 0);
+}
 
 void callback(char* topic, byte* payload, unsigned int length)
  {
@@ -38,10 +46,14 @@ void callback(char* topic, byte* payload, unsigned int length)
   }
   Serial.println();
 
+  // flash the LED
+  flashLed(100);
+
   // payload is two bytes
   // byte 0 is channel (1 - 4), byte 1 is state (1 = on, 0 = off)
   if (length == 2)
   {
+    
     switch(payload[0])
     {
       case 1: digitalWrite(RELAY1, payload[1]);
@@ -94,6 +106,9 @@ void setup()
   pinMode(RELAY2, OUTPUT);
   pinMode(RELAY3, OUTPUT);
   pinMode(RELAY4, OUTPUT);
+  pinMode(LED, OUTPUT);
+
+  
 
   // start serial port for debugging
   Serial.begin(57600);
