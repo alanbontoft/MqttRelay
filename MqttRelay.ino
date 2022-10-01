@@ -21,7 +21,7 @@
 #define MQTT_TOPIC "finchway/relays"
 
 
-#include <YunClient.h>
+#include <BridgeClient.h>
 #include <PubSubClient.h>
 
 // MQTT broker address
@@ -35,12 +35,12 @@ void flashLed(int ms)
 }
 
 void callback(char* topic, byte* payload, unsigned int length)
- {
+{
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
-  for (int i=0;i<length;i++) {
-    // Serial.print((char)payload[i]);
+  for (int i=0;i<length;i++)
+  {
     Serial.print(payload[i]);
     Serial.print(" ");
   }
@@ -70,12 +70,14 @@ void callback(char* topic, byte* payload, unsigned int length)
   
 }
 
-YunClient yunClient;
-PubSubClient mqtt(yunClient);
+BridgeClient client;
+PubSubClient mqtt(client);
 
-void reconnect() {
+void reconnect()
+{
   // Loop until we're reconnected
-  while (!mqtt.connected()) {
+  while (!mqtt.connected())
+  {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
     if (mqtt.connect("arduinoClient"))
@@ -108,8 +110,7 @@ void setup()
   pinMode(RELAY4, OUTPUT);
   pinMode(LED, OUTPUT);
 
-  
-
+ 
   // start serial port for debugging
   Serial.begin(57600);
 
@@ -126,8 +127,10 @@ void setup()
 
 void loop()
 {
-  if (!mqtt.connected()) {
+  if (!mqtt.connected())
+  {
     reconnect();
   }
+  
   mqtt.loop();
 }
