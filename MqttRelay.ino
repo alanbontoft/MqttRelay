@@ -36,6 +36,8 @@ void flashLed(int ms)
 
 void callback(char* topic, byte* payload, unsigned int length)
 {
+
+  uint8_t pinState;
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
@@ -50,19 +52,23 @@ void callback(char* topic, byte* payload, unsigned int length)
   flashLed(100);
 
   // payload is two bytes
-  // byte 0 is channel (1 - 4), byte 1 is state (1 = on, 0 = off)
+  // byte 0 is channel (1 - 4), byte 1 is state (0 = off, any other value = on)
   if (length == 2)
   {
+
+    // relay board has active low inputs
+    pinState = (payload[1] == 0) ? HIGH : LOW;
     
+    // set output for required relay
     switch(payload[0])
     {
-      case 1: digitalWrite(RELAY1, payload[1]);
+      case 1: digitalWrite(RELAY1, pinState);
               break;
-      case 2: digitalWrite(RELAY2, payload[1]);
+      case 2: digitalWrite(RELAY2, pinState);
               break;
-      case 3: digitalWrite(RELAY3, payload[1]);
+      case 3: digitalWrite(RELAY3, pinState);
               break;
-      case 4: digitalWrite(RELAY4, payload[1]);
+      case 4: digitalWrite(RELAY4, pinState);
               break;
       default: break;
     }
@@ -109,6 +115,13 @@ void setup()
   pinMode(RELAY3, OUTPUT);
   pinMode(RELAY4, OUTPUT);
   pinMode(LED, OUTPUT);
+
+  // set all outputs initially high (relays are active low)
+  digitalWrite(RELAY1, HIGH);
+  digitalWrite(RELAY2, HIGH);
+  digitalWrite(RELAY3, HIGH);
+  digitalWrite(RELAY4, HIGH);
+  digitalWrite(LED, LOW);
 
  
   // start serial port for debugging
